@@ -9,3 +9,4 @@ def get_access_token(payload, days):
         settings.SECRET_KEY,
         algorithm="HS256"
     )
+    return token

@@ -56,7 +56,7 @@ class LoginView(ModelViewSet):
         
         user = authenticate(
             username=valid_request.validated_data["email"],
-            password=valid_request.validated_data("password", None)
+            password=valid_request.validated_data.get("password", None)
         )
 
         if not user:
@@ -66,7 +66,7 @@ class LoginView(ModelViewSet):
             )
 
         """Get access token"""
-        access = get_access_token({"user_id", user.id}, 1)
+        access = get_access_token({"user_id": user.id}, 1)
 
         """Update user last login"""
         user.last_login = datatime.now()
