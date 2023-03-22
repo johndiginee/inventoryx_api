@@ -1,19 +1,21 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializers import (
-    CreateUserSerializer, CustomUser, LoginSerializer
+    CreateUserSerializer, CustomUser, LoginSerializer, UpdatePasswordSerializer,
+    CustomUserSerializer
 )
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from datatime import datatime
+from datetime import datetime
 from inventoryx_api.utils import get_access_token
-
+from inventoryx_api.custom_methods import IsAuthenticationCustom
 
 class CreateUserView(ModelViewSet):
     """Class for create user view."""
     http_method_names = ["post"]
     queryset = CustomUser.objects.all()
     serializer_class = CreateUserSerializer
+    permission_classes = (IsAuthenticationCustom, )
 
     def create(self, request):
         """Valid data and create user."""
@@ -72,4 +74,38 @@ class LoginView(ModelViewSet):
         user.last_login = datatime.now()
         user.save()
 
-        return Response(["access": access])
+        return Response({"access": access})
+
+class UpdatePasswordView(ModelViewSet):
+    """Class for user password update."""
+    serializer_class = UpdatePasswordSerializer
+    http_method_names = ["post"]
+    queryset = CustomUser.objects.all()
+
+    def create(self, request):
+        """Valid data request."""
+        valid_request = self.serializer_class(data=request.data)
+        valid_request.is_valid(raise_exception=True)
+
+        user = CustomUser.objects.filter(id=valid_request.validated_data["user_id"])
+
+        if not user:
+            raise Exception("User with id not found")
+        
+        user = user[0]
+
+        user.set_password(valid_request.validated_data["password"])
+        user.save()
+
+        return Response({"success": "User password updated"})
+
+class MeView(ModelViewSet):
+    """Class for me view."""
+    serializer_class = CustomUserSerializer
+    http_method_names = ["get"]
+    queryset = CustomUser.objects.all()
+    permission_classes = (IsAuthenticationCustom, )
+
+    def list(self, request):
+        data = self.serializer_class(request.user).data
+        return Response(data)

@@ -13,3 +13,15 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(required=False)
     is_new_user = serializers.BooleanField(default=False, required=False)
+
+class UpdatePasswordSerializer(serializers.Serializer):
+    """Class for user password update serializer."""
+    user_id = serializers.CharField()
+    password = serializers.CharField()
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    """Class for convert model data too json."""
+
+    class Meta:
+        mdoel = CustomUser
+        exclude = ("password", )
