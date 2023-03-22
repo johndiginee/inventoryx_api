@@ -4,8 +4,11 @@ from .utils import decodeJWT
 class IsAuthenticationCustom(BasePermission):
     """Class for adding permission."""
 
-    def has_permission(self, request):
-        auth_token = request.Meta.get("HTTP_AUTHORIZATION", None)
+    def has_permission(self, request, _):
+        try:
+            auth_token = request.Meta.get("HTTP_AUTHORIZATION", None)
+        except Exception:
+            return False
         if not auth_token:
             return False
         
