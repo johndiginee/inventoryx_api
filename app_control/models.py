@@ -16,7 +16,7 @@ class InventoryGroup(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ("-created_at")
+        ordering = ("-created_at",)
     
     def __init__(self, *args, **kwargs):
         sueper().__init__(*args, **kwargs)
@@ -42,7 +42,7 @@ class InventoryGroup(models.Model):
 class Inventory(models.Model):
     """Class for creating inventory items."""
     created_by = models.ForeignKey(
-        CustomUser, null=True, related_name="inventory_groups", 
+        CustomUser, null=True, related_name="inventory_items", 
         on_delete=models.SET_NULL
     )
     code = models.CharField(max_length=10, unique=True, null=True)
@@ -59,7 +59,7 @@ class Inventory(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ("-created_at")
+        ordering = ("-created_at",)
 
     def save(self, *args, **kwargs):
         """Save item"""
