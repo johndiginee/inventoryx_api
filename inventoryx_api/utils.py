@@ -2,6 +2,7 @@ import jwt
 from datetime import datetime, timedelta
 from django.conf import settings
 from user_control.models import CustomUser
+from rest_framework.pagination import PageNumberPagination
 
 def get_access_token(payload, days):
     """Define get access token"""
@@ -31,3 +32,8 @@ def decodeJWT(bearer):
             return CustomUser.objects.get(id=decoded["user_id"])
         except Exception:
             return None
+
+
+class CustomPagination(PageNumberPagination):
+    """Class for pagination."""
+    page_size=20
