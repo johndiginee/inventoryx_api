@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from .serializer import (
     Inventory, InventoryGroup, InventorySerializer, InventoryGroupSerializer,
     Shop, ShopSerializer, Invoice, InvoiceSerializer, InventoryWithSumSerializer,
-    ShopWithAmountSerializer
+    ShopWithAmountSerializer, InvoiceItem
 )
 from rest_framework.response import Response
 from inventoryx_api.custom_methods import IsAuthenticationCustom
@@ -244,3 +244,34 @@ class SaleShopView(ModelViewSet):
 
         response_data = ShopWithAmountSerializer(shops, many=True).data
         return Response(response_data)
+
+
+class PurchaseView(ModelViewSet):
+    """Class for purchase view."""
+    http_method_names = ('get',)
+    permission_classes = (IsAuthenticationCustom,)
+    queryset = InvoiceView.queryset
+
+    def list(self, request, *args, **kwargs):
+        """Get the list of purchase items."""
+        query_data = request.query_params.dict()
+        total = query_data.get('total', None)
+        query = InvoiceItem.objects.select_related("invoice", "item")
+
+        if not total: #Check for date range items
+            start_date = query_data.get("start_date", None)
+            end_date = query_data.get("end_date", None)
+
+            if start_date:
+                query = query.filter(
+                    created_at__range=[start_date, end_date]
+                )
+        
+        query = query.aggregate(
+            amount_total=Sum(F('amount') * F('quantity')), total=Sum('quanttity')
+            )
+        
+        return Response({
+            "price": "0.00" if not query.get("amount_total") else query.get("amount_total"),
+            "count": 0 if not query.get("total") else query.get("total"),
+        })
