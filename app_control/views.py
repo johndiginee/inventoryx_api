@@ -1,13 +1,14 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializer import (
     Inventory, InventoryGroup, InventorySerializer, InventoryGroupSerializer,
-    Shop, ShopSerializer, Invoice, InvoiceSerializer
+    Shop, ShopSerializer, Invoice, InvoiceSerializer, InventoryWithSumSerializer,
+    ShopWithAmountSerializer
 )
 from rest_framework.response import Response
 from inventoryx_api.custom_methods import IsAuthenticationCustom
 from inventoryx_api.utils import CustomPagination, get_query
-from django.db.models import Count, Sum
-from django.db.models.functions import Coalesce
+from django.db.models import Count, Sum, F
+from django.db.models.functions import Coalesce, TruncMonth
 from user_control.models import CustomUser
 
 
@@ -201,3 +202,45 @@ class SalePerformance(ModelViewSet):
                 Sum("inventory_invoices__quantity")
             )
         ).order('-sum_of_item')[0:10]
+
+        response_data = InventoryWithSumSerializer(items, many=True).data
+        return Response(response_data)
+
+
+class SaleShopView(ModelViewSet):
+    """Class for sale shop view."""
+    http_method_names = ('get',)
+    permission_classes = (IsAuthenticationCustom,)
+    queryset = InventoryView.queryset
+
+    def list(self, request, *args, **kwargs):
+        """Show sale show list."""
+        query_data = request.query_params.dict()
+        total = query_data.get('total', None)
+        monthly = query_data.get('monthly', None)
+        query = ShopView.queryset
+
+        if not total:
+            start_date = query_data.get("start_date", None)
+            end_date = query_data.get("end_date", None)
+
+            if start_date:
+                query = query.filter(
+                    sale_shop__created_at__range=[start_date, end_date]
+                )
+        
+        if monthly:
+            shops = query.annotate(month=TruncMonth('created_at')).values(
+                'month', 'name').annotate(amount_total=Sum(
+                    F("sale_shop__invoice_items__quantity") *
+                    F("sale_shop__invoice_items__amount")
+                ))
+
+        else:
+            shops = query.annotate(amount_total=Sum(
+                    F("sale_shop__invoice_items__quantity") *
+                    F("sale_shop__invoice_items__amount")
+                )).order_by("-amount_total")
+
+        response_data = ShopWithAmountSerializer(shops, many=True).data
+        return Response(response_data)
