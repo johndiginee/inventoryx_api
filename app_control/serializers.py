@@ -51,7 +51,7 @@ class ShopSerializer(serializers.ModelSerializer):
 
 class ShopWithAmountSerializer(ShopSerializer):
     """Class for shop with amount serializer."""
-    amount_total = serilizer.FloatField()
+    amount_total = serializers.FloatField()
     month = serializers.CharField(required=False)
 
 

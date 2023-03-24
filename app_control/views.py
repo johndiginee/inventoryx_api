@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializer import (
+from .serializers import (
     Inventory, InventoryGroup, InventorySerializer, InventoryGroupSerializer,
     Shop, ShopSerializer, Invoice, InvoiceSerializer, InventoryWithSumSerializer,
     ShopWithAmountSerializer, InvoiceItem

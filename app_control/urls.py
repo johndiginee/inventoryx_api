@@ -21,5 +21,5 @@ routers.register("invoice", InvoiceView, 'invoice')
 
 # Register the urls
 urlpatterns = [
-    path("", include(router.urls))
+    path("", include(routers.urls))
 ]
