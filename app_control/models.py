@@ -127,3 +127,28 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Invoice(models.Model):
+    """Class for creating invoice."""
+    created_by = models.ForeignKey(
+        CustomUser, null=True, related_name="invoices", 
+        on_delete=models.SET_NULL
+    )
+    shop = models.ForeignKey(
+        Shop, related_name="sale_shop", null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ("-created_at",)
+
+    def save(self, *args, **kwargs):
+        action = f"added new invoice"
+        super().save(*args, **kwargs)
+        add_user_activity(self.created_by, action=action)
+    
+    def delete(self, *args, **kwargs):
+        created_by = self.created_by
+        action = f"deleted invoice - '{self.id}'"
+        super().delete(*args, **kwargs)
+        add_user_activity(created_by, action=action)
