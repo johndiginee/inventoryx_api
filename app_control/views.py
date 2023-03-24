@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializer import (
     Inventory, InventoryGroup, InventorySerializer, InventoryGroupSerializer,
-    Shop, ShopSerializer
+    Shop, ShopSerializer, Invoice, InvoiceSerializer
 )
 from rest_framework.response import Response
 from inventoryx_api.custom_methods import IsAuthenticationCustom
@@ -101,6 +101,42 @@ class ShopView(ModelViewSet):
         if keyword:
             search_fields = (
                 "created_by__fullname", "created_by__email", "name"
+            )
+            query = get_query(keyword, search_fields)
+            results = results.filter(query)
+
+
+        return results
+
+    def create(self, request, *args, **kwargs):
+        """Over ride data"""
+        request.data.update({"created_by_id":request.user.id})
+        return super().create(request, *args, **kwargs)
+
+
+class InvoiceView(ModelViewSet):
+    """Class for invoice view."""
+    queryset = Invoice.objects.select_related(
+        "created_by", "shop").prefetch_related("invoice_items")
+    serializer_class = InvoiceSerializer
+    permission_classes = (IsAuthenticationCustom,)
+    pagination_class = CustomPagination
+
+
+    def get_query(self):
+        """Implementing search."""
+        if self.request.method.lower() != "get":
+            return self.queryset
+        
+        data = self.request.query_params.dict()
+        data.pop("page")
+        keyword = data.pop("keyword", None)
+
+        results = self.queryset(**data)
+
+        if keyword:
+            search_fields = (
+                "created_by__fullname", "created_by__email", "shop__name"
             )
             query = get_query(keyword, search_fields)
             results = results.filter(query)
