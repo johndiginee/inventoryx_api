@@ -178,7 +178,7 @@ class SummaryView(ModelViewSet):
         })
 
 
-class SalePerformance(ModelViewSet):
+class SalePerformanceView(ModelViewSet):
     """Class for sale performace."""
     http_method_names = ('get',)
     permission_classes = (IsAuthenticationCustom,)
@@ -209,8 +209,8 @@ class SalePerformance(ModelViewSet):
         return Response(response_data)
 
 
-class SaleShopView(ModelViewSet):
-    """Class for sale shop view."""
+class SaleByShopView(ModelViewSet):
+    """Class for sale by shop view."""
     http_method_names = ('get',)
     permission_classes = (IsAuthenticationCustom,)
     queryset = InventoryView.queryset
@@ -279,7 +279,7 @@ class PurchaseView(ModelViewSet):
         })
 
 
-class InventoryCSVLoader(ModelViewSet):
+class InventoryCSVLoaderView(ModelViewSet):
     """Class for loading CSV files."""
     http_method_names = ('post',)
     queryset = InventoryView.queryset
