@@ -10,6 +10,8 @@ from inventoryx_api.utils import CustomPagination, get_query
 from django.db.models import Count, Sum, F
 from django.db.models.functions import Coalesce, TruncMonth
 from user_control.models import CustomUser
+import csv
+import codecs
 
 
 class InventoryView(ModelViewSet):
@@ -275,3 +277,47 @@ class PurchaseView(ModelViewSet):
             "price": "0.00" if not query.get("amount_total") else query.get("amount_total"),
             "count": 0 if not query.get("total") else query.get("total"),
         })
+
+
+class InventoryCSVLoader(ModelViewSet):
+    """Class for loading CSV files."""
+    http_method_names = ('post',)
+    queryset = InventoryView.queryset
+    permission_classes = (IsAuthenticationCustom,)
+    serializer_class = InventorySerializer
+
+    def create(self, request, *args, **kwargs):
+        """Adding csv data."""
+        try:
+            data = request.FILES['data']
+        except Exception as e:
+            raise Exception("You need to provide inventory CSV 'data'")
+
+        inventory_items = []
+
+        try:
+            csv_reader = csv.reader(codecs.iterencode(data, 'utf-8'))
+            for row in csv_reader:
+                if not row[0]:
+                    continue
+                inventory_items.append(
+                    {
+                        "group_id": row[0],
+                        "total": row[1],
+                        "name": row[2],
+                        "price": row[3],
+                        "photo": row[4],
+                        "added_by_id": request.user.id,
+                    }
+                )
+        except csv.Error as e:
+            raise Exception(e)
+        
+        if not inventory_items:
+            raise Exception("CSV file cannot be empty")
+
+        data_validation = self.serializer_class(data=inventory_items, many=True)
+        data_validation.is_valid(raise_exception=True)
+        data_validation.save()
+
+        return Response({"success": "Inventory items added successfully"})
