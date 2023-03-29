@@ -10,7 +10,7 @@ from django.db.models import Q
 def get_access_token(payload, days):
     """Define get access token"""
     token = jwt.encode(
-        {"exp": datatime.now() + timedelta(days=days), **payload},
+        {"exp": datetime.now() + timedelta(days=days), **payload},
         settings.SECRET_KEY,
         algorithm="HS256"
     )
