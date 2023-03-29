@@ -22,9 +22,9 @@ class IsAuthenticationCustom(BasePermission):
         request.user = user
         return True
 
-def custom_exption_handler(exc, content):
+def custom_exception_handler(exc, content):
 
-    response = exption_handler(exc, context)
+    response = exception_handler(exc, context)
 
     if response is not None:
         return response
