@@ -85,7 +85,7 @@ class LoginView(ModelViewSet):
         access = get_access_token({"user_id": user.id}, 1)
 
         """Update user last login"""
-        user.last_login = datatime.now()
+        user.last_login = datetime.now()
         user.save()
 
         """Add user activities log"""
