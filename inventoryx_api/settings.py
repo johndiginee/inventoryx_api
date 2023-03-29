@@ -31,6 +31,11 @@ ALLOWED_HOSTS = ['*']
 # CREATING A NEW USER MODEL
 AUTH_USER_MODEL = "user_control.CustomUser"
 
+# Reference exception handler
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'inventoryx_api.custom_methods.custom_exception_handler',
+}
+
 
 # Application definition
 
@@ -41,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'user_control',
     'app_control'
@@ -49,12 +55,15 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS=True
 
 ROOT_URLCONF = 'inventoryx_api.urls'
 

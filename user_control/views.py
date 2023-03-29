@@ -47,7 +47,7 @@ class LoginView(ModelViewSet):
     """Class for user login view."""
     http_method_names = ["post"]
     queryset = CustomUser.objects.all()
-    serializer_class = LoginSerializer()
+    serializer_class = LoginSerializer
 
     def create(self, request):
         """Valid data and login user."""

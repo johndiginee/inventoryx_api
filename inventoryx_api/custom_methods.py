@@ -1,5 +1,7 @@
 from rest_framework.permissions import BasePermission
 from .utils import decodeJWT
+from rest_framework.views import exception_handler
+from rest_framework.response import Response
 
 class IsAuthenticationCustom(BasePermission):
     """Class for adding permission."""
@@ -19,3 +21,14 @@ class IsAuthenticationCustom(BasePermission):
         
         request.user = user
         return True
+
+def custom_exption_handler(exc, content):
+
+    response = exption_handler(exc, context)
+
+    if response is not None:
+        return response
+
+    exc_list = str(exc).split("DETAIL: ")
+
+    return Response({"error": exc_list[-1]}, status=403)
