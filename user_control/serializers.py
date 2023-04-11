@@ -23,7 +23,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     """Class for convert model data too json."""
 
     class Meta:
-        mdoel = CustomUser
+        model = CustomUser
         exclude = ("password", )
 
 class UserActivitiesSerializer(serializers.ModelSerializer):

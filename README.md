@@ -15,6 +15,8 @@ InventoryX is an inventory management web application backend API.
 * Psycopg2
 * Docker
 
+pip install -r requirements.txt
+
 ## Virtual Environment
 * python3 -m venv inventoryx_env
 * source inventoryx_env/bin/activate
