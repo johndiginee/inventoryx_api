@@ -1,1 +1,1 @@
-web gunicorn inventoryx.wsgi:application --log-file -
+web gunicorn inventoryx_api.wsgi:application --log-file -
