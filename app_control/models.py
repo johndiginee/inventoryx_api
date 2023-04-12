@@ -19,7 +19,7 @@ class InventoryGroup(models.Model):
         ordering = ("-created_at",)
     
     def __init__(self, *args, **kwargs):
-        sueper().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.old_name = self.name
 
     def save(self, *args, **kwargs):
@@ -110,7 +110,7 @@ class Shop(models.Model):
         ordering = ("-created_at",)
     
     def __init__(self, *args, **kwargs):
-        sueper().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.old_name = self.name
 
     def save(self, *args, **kwargs):

@@ -52,8 +52,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'user_control',
-    'app_control'
+    'app_control',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
